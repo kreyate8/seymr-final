@@ -1,0 +1,57 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://seymr.art/#organization",
+      "name": "SEYMR®",
+      "url": "https://seymr.art",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://seymr.art/assets/logo.png"
+      },
+      "description": "Maison de création souveraine spécialisée en Art Fréquentiel",
+      "foundingDate": "2018",
+      "founder": {
+        "@type": "Person",
+        "name": "SEYMR"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Marigot - Carrefour les 4 Chemins",
+        "addressLocality": "Saint-Barthélemy",
+        "postalCode": "97133",
+        "addressCountry": "BL"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+590-691-267-209",
+        "contactType": "Concierge",
+        "availableLanguage": ["fr", "en"],
+        "email": "concierge@seymr.art"
+      },
+      "sameAs": [
+        "https://instagram.com/seymr.art"
+      ]
+    },
+    {
+      "@type": "Product",
+      "@id": "https://seymr.art/#fauteuil-sisit",
+      "name": "Fauteuil « SISIT »",
+      "description": "Sculpture fonctionnelle en édition limitée à 44 exemplaires. Le fauteuil SEYMR® transcende la fonction pour devenir présence, où la géométrie sacrée rencontre le confort absolu.",
+      "brand": {
+        "@id": "https://seymr.art/#organization"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "25000",
+        "priceCurrency": "EUR",
+        "availability": "https://schema.org/LimitedAvailability",
+        "url": "https://seymr.art/#creations",
+        "itemCondition": "https://schema.org/NewCondition",
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": ["FR", "GB", "BL", "GP", "CH", "BE", "LU", "MC", "US", "CA"]
+          

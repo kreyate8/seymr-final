@@ -1,0 +1,330 @@
+{
+  "products": [
+    {
+      "id": "fauteuil-sisit",
+      "name": "Fauteuil SISIT",
+      "display_name": "Fauteuil « SISIT »",
+      "tagline": "L'art comme expérience à vivre",
+      "price": 25000,
+      "price_cents": 2500000,
+      "currency": "EUR",
+      "edition": "44 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Mobilier",
+      "featured": true,
+      "description_short": "Sculpture fonctionnelle en édition limitée à 44 exemplaires",
+      "description_long": "Le fauteuil SEYMR® transcende la fonction pour devenir présence. Sculpture habitable où la géométrie sacrée rencontre le confort absolu.",
+      "materials": "Velours haute couture, Bois FSC",
+      "specs": {
+        "height": "74 cm",
+        "width": "63 cm",
+        "depth": "49 cm",
+        "weight": "7 kg"
+      },
+      "images": {
+        "main": "assets/fauteuil-sisit-1-studio.webp",
+        "gallery": [
+          "assets/fauteuil-sisit-2-studio.webp",
+          "assets/fauteuil-sisit-3-angle.webp",
+          "assets/fauteuil-sisit-4-angle-bas.webp"
+        ]
+      }
+    },
+    {
+      "id": "paravent",
+      "name": "Paravent",
+      "display_name": "Paravent",
+      "tagline": "Architecture fréquentielle",
+      "price": 18000,
+      "price_cents": 1800000,
+      "currency": "EUR",
+      "edition": "44 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Mobilier",
+      "featured": false,
+      "description_short": "Architecture modulable - 4 panneaux",
+      "description_long": "Le paravent SEYMR® est une pièce d'architecture modulable. Il ne se contente pas de diviser l'espace ; il le sculpte.",
+      "materials": "Support textile, Structure bois",
+      "specs": {
+        "total_width": "224 cm",
+        "height": "152 cm",
+        "panels": "4"
+      },
+      "images": {
+        "main": "assets/paravent-1-studio.webp",
+        "gallery": [
+          "assets/paravent-2-studio.webp",
+          "assets/paravent-3-studio.webp"
+        ]
+      }
+    },
+    {
+      "id": "tapis-nexus",
+      "name": "Tapis NEXUS",
+      "display_name": "Tapis « NEXUS »",
+      "tagline": "Fondation territoriale",
+      "price": 12000,
+      "price_cents": 1200000,
+      "currency": "EUR",
+      "edition": "22 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Textile",
+      "featured": false,
+      "description_short": "Fondation territoriale - Panne de velours marbrée",
+      "description_long": "Un tapis SEYMR® définit un territoire unifié, une zone d'influence qui structure l'entièreté de la pièce.",
+      "materials": "Panne de velours marbrée",
+      "specs": {
+        "width": "128 cm",
+        "length": "150 cm"
+      },
+      "images": {
+        "main": "assets/tapis-nexus-1-ambiance.webp",
+        "gallery": [
+          "assets/tapis-nexus-2-ambiance.webp"
+        ]
+      }
+    },
+    {
+      "id": "repose-pieds-satellite",
+      "name": "Repose-pieds SATELLITE",
+      "display_name": "Repose-pieds SATELLITE",
+      "tagline": "Complément gravitationnel",
+      "price": 9000,
+      "price_cents": 900000,
+      "currency": "EUR",
+      "edition": "44 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Mobilier",
+      "featured": false,
+      "description_short": "Complément gravitationnel - Velours ChiChi ignifuge",
+      "description_long": "Conçu comme une extension du territoire personnel, SATELLITE est le complément gravitationnel d'une pièce maîtresse.",
+      "materials": "Velours ChiChi ignifuge, Bois FSC",
+      "specs": {
+        "dimensions": "38 x 38 x 39 cm",
+        "weight": "3.5 kg"
+      },
+      "images": {
+        "main": "assets/repose-pieds-satellite-1-studio.webp",
+        "gallery": [
+          "assets/repose-pieds-satellite-2-studio.webp",
+          "assets/repose-pieds-satellite-3-studio.webp"
+        ]
+      }
+    },
+    {
+      "id": "pouf-cosmosis",
+      "name": "Pouf COSMOSIS",
+      "display_name": "Pouf COSMOSIS",
+      "tagline": "Sphère gravitationnelle",
+      "price": 5700,
+      "price_cents": 570000,
+      "currency": "EUR",
+      "edition": "99 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Mobilier",
+      "featured": false,
+      "description_short": "Sphère gravitationnelle - Suédine Vision 250g/m²",
+      "description_long": "COSMOSIS est une sphère de 70 cm qui impose sa centralité magnétique à son espace.",
+      "materials": "Suédine Vision 250g/m², Rembourrage viscoélastique",
+      "specs": {
+        "diameter": "70 cm",
+        "height": "70 cm"
+      },
+      "images": {
+        "main": "assets/pouf-cosmosis-1-studio.webp",
+        "gallery": [
+          "assets/pouf-cosmosis-2-ambiance.webp",
+          "assets/pouf-cosmosis-2-studio.webp"
+        ]
+      }
+    },
+    {
+      "id": "tirage-art",
+      "name": "Tirage d'art",
+      "display_name": "Tirage d'art foulard en soie",
+      "tagline": "Archive fréquentielle encadrée",
+      "price": 14000,
+      "price_cents": 1400000,
+      "currency": "EUR",
+      "edition": "11 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Art",
+      "featured": false,
+      "description_short": "Archive fréquentielle encadrée - Soie 51cm",
+      "description_long": "Ce tirage d'art est la manifestation la plus pure de l'art fréquentiel, un fragment du code SEYMR®.",
+      "materials": "Soie 51cm, Cadre bois noir mat FSC",
+      "specs": {
+        "silk_size": "51 cm",
+        "frame_size": "61 cm"
+      },
+      "images": {
+        "main": "assets/tirage-dart-1-ambiance.webp",
+        "gallery": [
+          "assets/tirage-dart-5-detail.webp",
+          "assets/tirage-dart-6-detail.webp"
+        ]
+      }
+    },
+    {
+      "id": "sac-conqueror",
+      "name": "Sac CONQUEROR",
+      "display_name": "Sac « LE CONQUEROR »",
+      "tagline": "Territoire nomade",
+      "price": 4000,
+      "price_cents": 400000,
+      "currency": "EUR",
+      "edition": "99 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Maroquinerie",
+      "featured": false,
+      "description_short": "Territoire nomade - Cuir Nappa texturé",
+      "description_long": "Le sac CONQUEROR est un fragment de souveraineté mobile, une archive personnelle qui vous accompagne.",
+      "materials": "Cuir Nappa pleine fleur texturé",
+      "specs": {
+        "dimensions": "51 x 23 x 28.5 cm"
+      },
+      "images": {
+        "main": "assets/sac-conqueror-1-studio.webp",
+        "gallery": [
+          "assets/sac-conqueror-2-studio.webp",
+          "assets/sac-conqueror-3-studio.webp",
+          "assets/sac-conqueror-4-ambiance.webp"
+        ]
+      }
+    },
+    {
+      "id": "porte-documents",
+      "name": "Porte-documents",
+      "display_name": "Porte-documents",
+      "tagline": "Archive de pouvoir",
+      "price": 2500,
+      "price_cents": 250000,
+      "currency": "EUR",
+      "edition": "99 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Maroquinerie",
+      "featured": false,
+      "description_short": "Archive de pouvoir - Cuir Nappa texturé",
+      "description_long": "Conçu pour sanctuariser les instruments de votre souveraineté : contrats, documents, créations.",
+      "materials": "Cuir Nappa pleine fleur texturé",
+      "images": {
+        "main": "assets/porte-documents-1-studio.webp",
+        "gallery": [
+          "assets/porte-documents-2-ambiance.webp",
+          "assets/porte-documents-3-ambiance.webp"
+        ]
+      }
+    },
+    {
+      "id": "valise",
+      "name": "Valise",
+      "display_name": "Valise",
+      "tagline": "Vecteur de souveraineté",
+      "price": 3500,
+      "price_cents": 350000,
+      "currency": "EUR",
+      "edition": "99 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Maroquinerie",
+      "featured": false,
+      "description_short": "Vecteur de souveraineté - Format cabine",
+      "description_long": "Voyager avec cet objet, c'est déplacer son centre de gravité. Une affirmation de votre présence.",
+      "materials": "Coque protectrice avec design fusionné",
+      "specs": {
+        "format": "Cabine standard"
+      },
+      "images": {
+        "main": "assets/valise-1-studio.webp",
+        "gallery": []
+      }
+    },
+    {
+      "id": "casquette",
+      "name": "Casquette",
+      "display_name": "Casquette",
+      "tagline": "Sceau de reconnaissance",
+      "price": 950,
+      "price_cents": 95000,
+      "currency": "EUR",
+      "edition": "99 exemplaires",
+      "delivery_time": "4-12 jours",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Accessoires",
+      "featured": false,
+      "description_short": "Sceau de reconnaissance - Satin de soie 85g/m²",
+      "description_long": "Plus qu'un accessoire, cette casquette est un signe d'appartenance. Un sceau qui identifie ceux qui reconnaissent ce langage.",
+      "materials": "Satin de soie 85g/m²",
+      "images": {
+        "main": "assets/casquette-1-studio.webp",
+        "gallery": [
+          "assets/casquette-2-studio.webp",
+          "assets/casquette-3-studio.webp"
+        ]
+      }
+    },
+    {
+      "id": "le-livre",
+      "name": "Le Livre",
+      "display_name": "Le Livre",
+      "tagline": "Édition collector",
+      "price": null,
+      "price_cents": null,
+      "currency": "EUR",
+      "edition": "Sur demande",
+      "delivery_time": "À définir",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Édition",
+      "featured": false,
+      "description_short": "Édition collector - Sur demande",
+      "description_long": "Une édition collector qui documente l'univers SEYMR®. Disponible sur demande uniquement.",
+      "materials": "À définir",
+      "images": {
+        "main": "assets/livre-placeholder.webp",
+        "gallery": []
+      }
+    },
+    {
+      "id": "autre",
+      "name": "Autre",
+      "display_name": "Autre demande",
+      "tagline": "Création sur mesure",
+      "price": null,
+      "price_cents": null,
+      "currency": "EUR",
+      "edition": "À définir",
+      "delivery_time": "À définir",
+      "manufacturing": "Londres",
+      "design": "Guadeloupe",
+      "category": "Sur mesure",
+      "featured": false,
+      "description_short": "Création sur mesure",
+      "description_long": "Partagez votre vision avec notre équipe pour une création personnalisée.",
+      "materials": "À définir",
+      "images": {
+        "main": "assets/custom-placeholder.webp",
+        "gallery": []
+      }
+    }
+  ]
+}
+      
