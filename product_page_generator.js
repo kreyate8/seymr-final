@@ -1,10 +1,11 @@
-const path = require('path');
+const path = require('path'); 
+/* // Correction : Ajout du début de commentaire
  * SEYMR® - Product Pages Generator
  * Génère automatiquement toutes les pages produits depuis products.json
  */
 
 const fs = require('fs').promises;
-const path = require('path');
+// Correction : Suppression de la ligne 'path' en double
 
 // Descriptions complètes des produits (depuis votre document)
 const PRODUCT_DESCRIPTIONS = {
@@ -183,26 +184,30 @@ const PRODUCT_DESCRIPTIONS = {
 
 /**
  * Template HTML de page produit
+ * Génère le contenu HTML complet pour une page produit donnée.
  */
 function generateProductHTML(product, description) {
   const slug = product.id;
-  const itemId = `SEYMR-${slug.toUpperCase().replace(/-/g, '')}-001`;
+  const itemId = `SEYMR-${slug.toUpperCase().replace(/-/g, '')}-001`; // ID unique pour GA4/Schema
   
-  // Générer les specs HTML
+  // Générer le HTML pour la liste des spécifications complètes
   const specsHTML = description.specs.map(spec => `<li>${spec}</li>`).join('\n                                ');
   
-  // Générer les sections HTML
+  // Générer le HTML pour les sections de description
   const sectionsHTML = description.sections.map(section => `
                             <h3>${section.title}</h3>
                             <p>${section.content}</p>
                         `).join('\n');
   
-  // Images (supposer 4 images max)
-  const imagesArray = product.images.gallery.slice(0, 4);
-  while (imagesArray.length < 4) {
-    imagesArray.push(product.images.main);
-  }
-  
+  // Préparer les images pour la galerie (maximum 4 vignettes)
+  const galleryImages = product.images.gallery || [];
+  const mainImage = product.images.main || 'assets/placeholder.jpg'; // Image principale ou fallback
+  const thumbnailImages = [mainImage, ...galleryImages].slice(0, 4); // Prend l'image principale + 3 de la galerie max
+
+  // Formatter le prix pour l'affichage
+  const formattedPrice = product.price ? product.price.toLocaleString('fr-FR') + ' €' : 'Sur demande';
+
+  // Structure HTML complète de la page
   return `<!DOCTYPE html>
 <html lang="fr" data-theme="dark">
 <head>
@@ -212,22 +217,19 @@ function generateProductHTML(product, description) {
     
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="${product.display_name} SEYMR® - ${product.description_short}. ${product.price ? product.price.toLocaleString('fr-FR') + ' €' : 'Sur demande'}. ${product.manufacturing}.">
+    <meta name="description" content="${product.display_name} SEYMR® - ${product.description_short}. ${formattedPrice}. ${product.manufacturing}.">
     <meta name="keywords" content="${slug}, SEYMR, art fréquentiel, ${product.category}, édition limitée">
     
     <meta property="og:title" content="${product.display_name} - ${product.tagline} | SEYMR®">
     <meta property="og:description" content="${product.edition}. ${product.description_long.substring(0, 150)}...">
     <meta property="og:type" content="product">
-    <meta property="og:url" content="https://seymr.art/${slug}">
-    <meta property="og:image" content="https://seymr.art/${product.images.main}">
+    <meta property="og:url" content="https://seymr.art/${slug}.html"> <meta property="og:image" content="https://seymr.art/${mainImage}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     ${product.price ? `<meta property="product:price:amount" content="${product.price}">` : ''}
     <meta property="product:price:currency" content="EUR">
     
-    <link rel="canonical" href="https://seymr.art/${slug}">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="canonical" href="https://seymr.art/${slug}.html"> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <style>
@@ -235,8 +237,8 @@ function generateProductHTML(product, description) {
     </style>
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="product-page.css">
+    <link rel="stylesheet" href="/assets/css/styles.css"> 
+    <link rel="stylesheet" href="/assets/css/product_page.css"> 
     
     <script type="application/ld+json">
     {
@@ -245,27 +247,28 @@ function generateProductHTML(product, description) {
       "name": "${product.display_name}",
       "description": "${product.description_long}",
       "image": [
-        ${imagesArray.map(img => `"https://seymr.art/${img}"`).join(',\n        ')}
+        ${thumbnailImages.map(img => `"https://seymr.art/${img}"`).join(',\n        ')}
       ],
-      "sku": "${itemId}",
+      "sku": "${itemId}", // SKU unique généré
       "brand": {
         "@type": "Brand",
         "name": "SEYMR®"
       },
       "offers": {
         "@type": "Offer",
-        "url": "https://seymr.art/${slug}",
+        "url": "https://seymr.art/${slug}.html", // Lien vers cette page
         "priceCurrency": "EUR",
-        ${product.price ? `"price": "${product.price}",` : ''}
-        "priceValidUntil": "2025-12-31",
-        "itemCondition": "https://schema.org/NewCondition",
-        "availability": "${product.edition.includes('44') || product.edition.includes('11') ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock'}",
+        ${product.price ? `"price": "${product.price}",` : ''} // Prix si disponible
+        "priceValidUntil": "2025-12-31", // Validité du prix (à ajuster si besoin)
+        "itemCondition": "https://schema.org/NewCondition", // État neuf
+        "availability": "${product.edition && (product.edition.includes('exemplaires') || product.edition.includes('Limited')) ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock'}", // Disponibilité basée sur l'édition
         "seller": {
           "@type": "Organization",
           "name": "SEYMR®"
         }
       },
       "material": "${product.materials}",
+      // Propriétés additionnelles pour enrichir le schema
       "additionalProperty": [
         {
           "@type": "PropertyValue",
@@ -282,6 +285,17 @@ function generateProductHTML(product, description) {
           "name": "Conception",
           "value": "${product.design}"
         }
+        // Ajouter d'autres specs si pertinent (poids, dimensions spécifiques)
+        ${product.specs && product.specs.dimensions ? `, {
+          "@type": "PropertyValue",
+          "name": "Dimensions",
+          "value": "${product.specs.dimensions}"
+        }` : ''}
+         ${product.specs && product.specs.weight ? `, {
+          "@type": "PropertyValue",
+          "name": "Poids",
+          "value": "${product.specs.weight}"
+        }` : ''}
       ]
     }
     </script>
@@ -291,13 +305,14 @@ function generateProductHTML(product, description) {
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
+      gtag('config', 'G-XXXXXXXXXX'); // Remplacez par votre ID GA4 réel
       
+      // Événement GA4 - view_item (vue du produit)
       gtag('event', 'view_item', {
         currency: 'EUR',
-        value: ${product.price || 0},
+        value: ${product.price || 0}, // Utilise 0 si prix non défini
         items: [{
-          item_id: '${itemId}',
+          item_id: '${itemId}', // SKU généré
           item_name: '${product.display_name}',
           item_category: '${product.category}',
           item_brand: 'SEYMR',
@@ -313,7 +328,7 @@ function generateProductHTML(product, description) {
     <nav role="navigation" aria-label="Navigation principale">
         <div class="nav-container">
             <a href="/index.html" class="nav-logo" aria-label="SEYMR - Accueil">SEYMR®</a>
-            <div class="nav-center">
+            <div class="nav-center"> 
                 <ul class="nav-menu" role="menubar">
                     <li role="none"><a href="/index.html#oeuvre" class="nav-link" role="menuitem">L'Œuvre</a></li>
                     <li role="none"><a href="/index.html#philosophie" class="nav-link" role="menuitem">Philosophie</a></li>
@@ -323,7 +338,7 @@ function generateProductHTML(product, description) {
             </div>
             <div class="nav-right">
                 <button class="theme-toggle" id="themeToggle" aria-label="Basculer le thème">
-                    <span class="theme-icon"></span>
+                    <span class="theme-icon"></span> 
                 </button>
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu mobile" aria-expanded="false">
                     <span></span><span></span><span></span>
@@ -331,6 +346,14 @@ function generateProductHTML(product, description) {
             </div>
         </div>
     </nav>
+    <div id="navigation-overlay" class="navigation-overlay" aria-hidden="true">
+        <ul class="mobile-nav" role="menu">
+             <li role="none"><a href="/index.html#oeuvre" class="nav-link" role="menuitem">L'Œuvre</a></li>
+             <li role="none"><a href="/index.html#philosophie" class="nav-link" role="menuitem">Philosophie</a></li>
+             <li role="none"><a href="/index.html#creations" class="nav-link" role="menuitem">Créations</a></li>
+             <li role="none"><a href="/index.html#contact" class="nav-link" role="menuitem">Contact</a></li>
+        </ul>
+    </div>
 
     <main id="main">
         <section class="product-hero">
@@ -343,21 +366,19 @@ function generateProductHTML(product, description) {
 
                 <div class="product-layout">
                     <div class="product-gallery">
-                        <img src="${product.images.main}" 
+                        <img src="${mainImage}" 
                              alt="${product.display_name} SEYMR® - Vue principale" 
                              class="main-image" 
                              id="mainImage"
-                             fetchpriority="high">
-                        
-                        <div class="thumbnail-grid">
-                            ${imagesArray.map((img, i) => `<img src="${img}" alt="Vue ${i + 1}" class="thumbnail ${i === 0 ? 'active' : ''}" data-full="${img}">`).join('\n                            ')}
+                             fetchpriority="high" width="800" height="800"> <div class="thumbnail-grid">
+                            ${thumbnailImages.map((img, i) => `<img src="${img}" alt="Vue ${i + 1} de ${product.display_name}" class="thumbnail ${img === mainImage ? 'active' : ''}" data-full="${img}" width="150" height="150">`).join('\n                            ')}
                         </div>
                     </div>
 
                     <div class="product-details">
                         <h1 class="product-title">${product.display_name}</h1>
                         <p class="product-tagline">${product.tagline}</p>
-                        <div class="product-price">${product.price ? product.price.toLocaleString('fr-FR') + ' €' : 'Sur demande'}</div>
+                        <div class="product-price">${formattedPrice}</div>
 
                         <div class="product-specs">
                             <div class="spec-item">
@@ -384,8 +405,7 @@ function generateProductHTML(product, description) {
                             </div>
                             <div class="spec-item">
                                 <span class="spec-label">Délai</span>
-                                <span class="spec-value">${product.delivery_time}</span>
-                            </div>
+                                <span class="spec-value">${product.delivery_time}</span> </div>
                         </div>
 
                         <div class="product-description">
@@ -434,31 +454,61 @@ function generateProductHTML(product, description) {
         </div>
     </footer>
 
-    <script src="ga4-events.js" defer></script>
-    <script>
-        // Galerie d'images
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        const mainImage = document.getElementById('mainImage');
-        
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', function() {
-                thumbnails.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                mainImage.src = this.dataset.full;
-            });
-        });
-        
-        // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', function() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-        
-        // Mobile menu
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            this.classList.toggle('active');
+    <script src="/assets/js/ga4_events_tracking.js" defer></script> <script src="/assets/js/main.js" defer></script> <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Galerie d'images simple
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const mainImage = document.getElementById('mainImage');
+            
+            if (mainImage && thumbnails.length > 0) {
+                thumbnails.forEach(thumb => {
+                    thumb.addEventListener('click', function() {
+                        // Gestion du fade (optionnel)
+                        mainImage.classList.add('fade-out');
+                        setTimeout(() => {
+                           mainImage.src = this.dataset.full;
+                           mainImage.alt = this.alt; // Mettre à jour l'alt text
+                           mainImage.classList.remove('fade-out');
+                        }, 150); // Moitié de la transition CSS
+
+                        thumbnails.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Envoyer événement GA4 si configuré
+                        // window.SEYMR_GA4?.content.selectImage(this.dataset.full);
+                    });
+                });
+            }
+
+            // Pré-sélection produit via bouton CTA
+             const acquireButton = document.getElementById('acquireBtn');
+             if (acquireButton) {
+                 acquireButton.addEventListener('click', function(e) {
+                      // Pas besoin de e.preventDefault() si le lien pointe déjà vers #contact
+                      const productName = this.dataset.product;
+                      // On stocke temporairement pour que main.js puisse le récupérer
+                      sessionStorage.setItem('preselectedProduct', productName); 
+
+                      // Envoyer événement GA4 'add_to_cart'
+                      const priceText = document.querySelector('.product-price')?.textContent || '0';
+                      const price = parseFloat(priceText.replace(/[^0-9]/g, '')) || 0;
+                       if (typeof gtag === 'function') {
+                            gtag('event', 'add_to_cart', {
+                                currency: 'EUR',
+                                value: price,
+                                items: [{
+                                    item_id: '${itemId}', // Injecté par le template
+                                    item_name: '${product.display_name}', // Injecté par le template
+                                    item_brand: 'SEYMR',
+                                    price: price,
+                                    quantity: 1
+                                }]
+                            });
+                       } else {
+                            console.warn('gtag non défini, add_to_cart non envoyé.');
+                       }
+                 });
+             }
         });
     </script>
 </body>
@@ -466,53 +516,81 @@ function generateProductHTML(product, description) {
 }
 
 /**
- * Fonction principale
+ * Fonction principale qui génère toutes les pages produits.
  */
 async function generateAllProductPages() {
   try {
-    // Lire products.json
-        const productsData = await fs.readFile(path.join(process.cwd(), '_data', 'products.json'), 'utf8');
+    console.log("Lecture du catalogue produits...");
+    // Lire le fichier products.json en utilisant un chemin absolu basé sur le répertoire courant
+    const productsData = await fs.readFile(path.join(process.cwd(), '_data', 'products.json'), 'utf8');
     const { products } = JSON.parse(productsData);
     
-    console.log(`🚀 Génération de ${products.length} pages produits...\n`);
+    console.log(`🚀 Démarrage de la génération pour ${products.length} produits trouvés...`);
     
-    let generated = 0;
-    let skipped = 0;
+    let generatedCount = 0;
+    let skippedCount = 0;
     
+    // Boucler sur chaque produit du catalogue
     for (const product of products) {
-      const slug = product.id;
-      const description = PRODUCT_DESCRIPTIONS[slug];
+      const slug = product.id; // Utiliser l'ID comme slug (nom de fichier)
       
-      if (!description) {
-        console.log(`⚠️  Skipping ${slug} (no description)`);
-        skipped++;
-        continue;
+      // Ignorer les entrées 'autre' ou 'le-livre' si elles n'ont pas de description dédiée
+      if (slug === 'autre' || slug === 'le-livre') { 
+          // À moins que vous n'ajoutiez une entrée spécifique dans PRODUCT_DESCRIPTIONS pour eux
+          if (!PRODUCT_DESCRIPTIONS[slug]) {
+             console.log(`⏩ Ignoré (entrée spéciale): ${product.display_name}`);
+             skippedCount++;
+             continue; 
+          }
       }
       
-      const html = generateProductHTML(product, description);
-      const filename = `${slug}.html`;
+      const description = PRODUCT_DESCRIPTIONS[slug]; // Récupérer la description longue associée
       
-      await fs.writeFile(filename, html, 'utf8');
-      console.log(`✅ Généré: ${filename}`);
-      generated++;
+      // Vérifier si la description existe pour ce produit
+      if (!description) {
+        console.warn(`⚠️  Attention: Aucune description longue trouvée pour ${slug}. Page ignorée.`);
+        skippedCount++;
+        continue; // Passer au produit suivant
+      }
+      
+      // Vérifier si les images existent
+       if (!product.images || !product.images.main) {
+           console.warn(`⚠️  Attention: Image principale manquante pour ${slug}. Utilisation d'un placeholder.`);
+           // Assigner un placeholder si manquant pour éviter erreur
+           product.images = product.images || {};
+           product.images.main = 'assets/placeholder.jpg';
+           product.images.gallery = product.images.gallery || [];
+       }
+       
+      // Générer le contenu HTML complet pour la page
+      console.log(`   🛠️  Génération de ${slug}.html...`);
+      const htmlContent = generateProductHTML(product, description);
+      
+      // Définir le nom du fichier de sortie (à la racine du projet)
+      const outputFilename = `${slug}.html`;
+      
+      // Écrire le contenu HTML dans le fichier
+      await fs.writeFile(outputFilename, htmlContent, 'utf8');
+      console.log(`   ✅ Fichier généré: ${outputFilename}`);
+      generatedCount++;
     }
     
-    console.log(`\n✨ Terminé! ${generated} pages générées, ${skipped} ignorées.`);
-    console.log(`\n📝 Prochaines étapes:`);
-    console.log(`   1. Créer product-page.css avec les styles de galerie`);
-    console.log(`   2. Vérifier les images dans /assets`);
-    console.log(`   3. Tester localement: vercel dev`);
-    console.log(`   4. Déployer: vercel --prod`);
+    // Afficher le résumé final
+    console.log(`\n✨ Terminé! ${generatedCount} pages produits générées, ${skippedCount} entrées ignorées.`);
+    console.log(`\n Asegúrese de que los archivos CSS y JS referenciados existan en las rutas correctas (/assets/css/..., /assets/js/...).`);
+    console.log(`\n Déployez maintenant sur Vercel via GitHub.`);
     
   } catch (error) {
-    console.error('❌ Erreur:', error);
-    process.exit(1);
+    // Gérer les erreurs potentielles (lecture de fichier, écriture, JSON invalide)
+    console.error('❌ Erreur critique lors de la génération des pages:', error);
+    process.exit(1); // Arrêter le script en cas d'erreur grave
   }
 }
 
-// Exécuter si appelé directement
+// Exécuter la fonction principale si le script est appelé directement
 if (require.main === module) {
   generateAllProductPages();
 }
 
+// Exporter les fonctions si besoin (pour tests ou autre usage)
 module.exports = { generateAllProductPages, generateProductHTML };
