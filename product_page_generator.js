@@ -1,4 +1,4 @@
-const path = require('path'); 
+const path = require('path');
 /* // Correction : Ajout du début de commentaire
  * SEYMR® - Product Pages Generator
  * Génère automatiquement toutes les pages produits depuis products.json
@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs').promises;
 // Correction : Suppression de la ligne 'path' en double
 
-// Descriptions complètes des produits (depuis votre document)
+// Descriptions complètes des produits
 const PRODUCT_DESCRIPTIONS = {
   'fauteuil-sisit': {
     intro: "Le fauteuil SEYMR® naît d'une ambition rare : inviter l'art dans l'intimité du quotidien, non comme un objet de contemplation, mais comme une expérience à vivre. Il est le fruit d'un dialogue entre la fulgurance créative de la Guadeloupe et l'excellence artisanale de Londres.",
@@ -180,6 +180,7 @@ const PRODUCT_DESCRIPTIONS = {
       "Transposition digitale fidèle"
     ]
   }
+  // Ajoutez d'autres produits ici si nécessaire
 };
 
 /**
@@ -188,21 +189,23 @@ const PRODUCT_DESCRIPTIONS = {
  */
 function generateProductHTML(product, description) {
   const slug = product.id;
+  const pageUrl = `https://seymr.art/${slug}.html`; // URL complète avec .html
   const itemId = `SEYMR-${slug.toUpperCase().replace(/-/g, '')}-001`; // ID unique pour GA4/Schema
   
   // Générer le HTML pour la liste des spécifications complètes
-  const specsHTML = description.specs.map(spec => `<li>${spec}</li>`).join('\n                                ');
+  const specsHTML = (description.specs || []).map(spec => `<li>${spec}</li>`).join('\n                                ');
   
   // Générer le HTML pour les sections de description
-  const sectionsHTML = description.sections.map(section => `
+  const sectionsHTML = (description.sections || []).map(section => `
                             <h3>${section.title}</h3>
                             <p>${section.content}</p>
                         `).join('\n');
   
-  // Préparer les images pour la galerie (maximum 4 vignettes)
-  const galleryImages = product.images.gallery || [];
-  const mainImage = product.images.main || 'assets/placeholder.jpg'; // Image principale ou fallback
+  // Préparer les images pour la galerie (plus robuste)
+  const mainImage = product.images?.main || 'assets/placeholder.jpg'; // Image principale ou fallback
+  const galleryImages = Array.isArray(product.images?.gallery) ? product.images.gallery : [];
   const thumbnailImages = [mainImage, ...galleryImages].slice(0, 4); // Prend l'image principale + 3 de la galerie max
+  const schemaImages = [mainImage, ...galleryImages]; // Toutes les images pour Schema.org
 
   // Formatter le prix pour l'affichage
   const formattedPrice = product.price ? product.price.toLocaleString('fr-FR') + ' €' : 'Sur demande';
@@ -223,17 +226,17 @@ function generateProductHTML(product, description) {
     <meta property="og:title" content="${product.display_name} - ${product.tagline} | SEYMR®">
     <meta property="og:description" content="${product.edition}. ${product.description_long.substring(0, 150)}...">
     <meta property="og:type" content="product">
-    <meta property="og:url" content="https://seymr.art/${slug}.html"> <meta property="og:image" content="https://seymr.art/${mainImage}">
-    <meta property="og:image:width" content="1200">
+    <meta property="og:url" content="${pageUrl}"> <meta property="og:image" content="https://seymr.art/${mainImage}"> <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     ${product.price ? `<meta property="product:price:amount" content="${product.price}">` : ''}
     <meta property="product:price:currency" content="EUR">
     
-    <link rel="canonical" href="https://seymr.art/${slug}.html"> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="canonical" href="${pageUrl}"> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <style>
         :root{--or-souverain:#D4AF37;--noir-absolu:#0A0A0A;--blanc-pur:#FAFAFA;--gris-noble:#2A2A2A;--font-titre:'Cormorant Garamond',serif;--font-corps:'Montserrat',sans-serif}*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--font-corps);background:var(--noir-absolu);color:var(--blanc-pur);overflow-x:hidden;min-height:100vh;font-weight:300;line-height:1.6}nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(10,10,10,0.98);backdrop-filter:blur(10px);transition:all .3s}
+        .skip-link{position:absolute;top:-40px;left:0;background:var(--or-souverain);color:var(--noir-absolu);padding:8px;text-decoration:none;z-index:9999} .skip-link:focus{top:0}
     </style>
     
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
@@ -247,7 +250,7 @@ function generateProductHTML(product, description) {
       "name": "${product.display_name}",
       "description": "${product.description_long}",
       "image": [
-        ${thumbnailImages.map(img => `"https://seymr.art/${img}"`).join(',\n        ')}
+        ${schemaImages.map(img => `"https://seymr.art/${img}"`).join(',\n        ')}
       ],
       "sku": "${itemId}", // SKU unique généré
       "brand": {
@@ -256,7 +259,7 @@ function generateProductHTML(product, description) {
       },
       "offers": {
         "@type": "Offer",
-        "url": "https://seymr.art/${slug}.html", // Lien vers cette page
+        "url": "${pageUrl}", // Correction: URL avec .html
         "priceCurrency": "EUR",
         ${product.price ? `"price": "${product.price}",` : ''} // Prix si disponible
         "priceValidUntil": "2025-12-31", // Validité du prix (à ajuster si besoin)
@@ -351,7 +354,10 @@ function generateProductHTML(product, description) {
              <li role="none"><a href="/index.html#oeuvre" class="nav-link" role="menuitem">L'Œuvre</a></li>
              <li role="none"><a href="/index.html#philosophie" class="nav-link" role="menuitem">Philosophie</a></li>
              <li role="none"><a href="/index.html#creations" class="nav-link" role="menuitem">Créations</a></li>
+             <li role="none"><a href="/index.html#livre" class="nav-link" role="menuitem">Le Livre</a></li>
+             <li role="none"><a href="/index.html#archives" class="nav-link" role="menuitem">Archives</a></li>
              <li role="none"><a href="/index.html#contact" class="nav-link" role="menuitem">Contact</a></li>
+             <li role="none"><a href="#sanctuaire" class="nav-link sanctuary-mobile" data-modal="sanctuaire">Sanctuaire</a></li>
         </ul>
     </div>
 
@@ -366,12 +372,12 @@ function generateProductHTML(product, description) {
 
                 <div class="product-layout">
                     <div class="product-gallery">
-                        <img src="${mainImage}" 
+                        <img src="/${mainImage}" 
                              alt="${product.display_name} SEYMR® - Vue principale" 
                              class="main-image" 
                              id="mainImage"
                              fetchpriority="high" width="800" height="800"> <div class="thumbnail-grid">
-                            ${thumbnailImages.map((img, i) => `<img src="${img}" alt="Vue ${i + 1} de ${product.display_name}" class="thumbnail ${img === mainImage ? 'active' : ''}" data-full="${img}" width="150" height="150">`).join('\n                            ')}
+                            ${thumbnailImages.map((img, i) => `<img src="/${img}" alt="Vue ${i + 1} de ${product.display_name}" class="thumbnail ${img === mainImage ? 'active' : ''}" data-full="/${img}" width="150" height="150">`).join('\n                            ')}
                         </div>
                     </div>
 
@@ -409,13 +415,10 @@ function generateProductHTML(product, description) {
                         </div>
 
                         <div class="product-description">
-                            <p>${description.intro}</p>
+                            ${description.intro ? `<p>${description.intro}</p>` : ''}
                             ${sectionsHTML}
                             
-                            <h3>Spécifications Complètes</h3>
-                            <ul>
-                                ${specsHTML}
-                            </ul>
+                            ${specsHTML.length > 0 ? `<h3>Spécifications Complètes</h3><ul>${specsHTML}</ul>` : ''}
                         </div>
 
                         <div class="product-cta">
@@ -454,22 +457,34 @@ function generateProductHTML(product, description) {
         </div>
     </footer>
 
-    <script src="/assets/js/ga4_events_tracking.js" defer></script> <script src="/assets/js/main.js" defer></script> <script>
+    <script src="/assets/js/ga4_events_tracking.js" defer></script> 
+    <script src="/assets/js/main.js" defer></script> 
+    
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Galerie d'images simple
             const thumbnails = document.querySelectorAll('.thumbnail');
             const mainImage = document.getElementById('mainImage');
             
             if (mainImage && thumbnails.length > 0) {
+                 // S'assure que la première miniature correspond à l'image principale initiale
+                 const firstThumbSrc = thumbnails[0]?.dataset?.full;
+                 if (firstThumbSrc && mainImage.src !== firstThumbSrc) {
+                     mainImage.src = firstThumbSrc; // Corrige si nécessaire
+                 }
+                
                 thumbnails.forEach(thumb => {
                     thumb.addEventListener('click', function() {
-                        // Gestion du fade (optionnel)
-                        mainImage.classList.add('fade-out');
+                        if (this.classList.contains('active')) return; // Ne rien faire si déjà active
+
+                        // Gestion du fade (optionnel mais recommandé)
+                        mainImage.style.opacity = '0.5'; // Commence le fondu sortant
+                        
                         setTimeout(() => {
                            mainImage.src = this.dataset.full;
                            mainImage.alt = this.alt; // Mettre à jour l'alt text
-                           mainImage.classList.remove('fade-out');
-                        }, 150); // Moitié de la transition CSS
+                           mainImage.style.opacity = '1'; // Fondu entrant
+                        }, 150); // Doit correspondre à la moitié de la transition CSS si utilisée
 
                         thumbnails.forEach(t => t.classList.remove('active'));
                         this.classList.add('active');
@@ -484,21 +499,25 @@ function generateProductHTML(product, description) {
              const acquireButton = document.getElementById('acquireBtn');
              if (acquireButton) {
                  acquireButton.addEventListener('click', function(e) {
-                      // Pas besoin de e.preventDefault() si le lien pointe déjà vers #contact
+                      // Pas besoin de e.preventDefault() si le lien pointe déjà vers #contact sur index.html
                       const productName = this.dataset.product;
-                      // On stocke temporairement pour que main.js puisse le récupérer
+                      // On stocke temporairement pour que main.js (sur index.html) puisse le récupérer
                       sessionStorage.setItem('preselectedProduct', productName); 
 
                       // Envoyer événement GA4 'add_to_cart'
                       const priceText = document.querySelector('.product-price')?.textContent || '0';
-                      const price = parseFloat(priceText.replace(/[^0-9]/g, '')) || 0;
+                      const price = parseFloat(priceText.replace(/[^\\d.,]/g, '').replace(',', '.')) || 0; // Gère € et . ou ,
+                      
                        if (typeof gtag === 'function') {
+                            const itemIdForGA = '${itemId}'; // Injecté par le template
+                            const productNameForGA = '${product.display_name}'; // Injecté par le template
+                            
                             gtag('event', 'add_to_cart', {
                                 currency: 'EUR',
                                 value: price,
                                 items: [{
-                                    item_id: '${itemId}', // Injecté par le template
-                                    item_name: '${product.display_name}', // Injecté par le template
+                                    item_id: itemIdForGA,
+                                    item_name: productNameForGA,
                                     item_brand: 'SEYMR',
                                     price: price,
                                     quantity: 1
@@ -520,9 +539,10 @@ function generateProductHTML(product, description) {
  */
 async function generateAllProductPages() {
   try {
-    console.log("Lecture du catalogue produits...");
-    // Lire le fichier products.json en utilisant un chemin absolu basé sur le répertoire courant
-    const productsData = await fs.readFile(path.join(process.cwd(), '_data', 'products.json'), 'utf8');
+    console.log("Lecture du catalogue produits depuis _data/products.json...");
+    // Correction: Utilisation du chemin absolu correct pour Vercel
+    const productsJsonPath = path.join(process.cwd(), '_data', 'products.json');
+    const productsData = await fs.readFile(productsJsonPath, 'utf8');
     const { products } = JSON.parse(productsData);
     
     console.log(`🚀 Démarrage de la génération pour ${products.length} produits trouvés...`);
@@ -536,9 +556,8 @@ async function generateAllProductPages() {
       
       // Ignorer les entrées 'autre' ou 'le-livre' si elles n'ont pas de description dédiée
       if (slug === 'autre' || slug === 'le-livre') { 
-          // À moins que vous n'ajoutiez une entrée spécifique dans PRODUCT_DESCRIPTIONS pour eux
           if (!PRODUCT_DESCRIPTIONS[slug]) {
-             console.log(`⏩ Ignoré (entrée spéciale): ${product.display_name}`);
+             console.log(`⏩ Ignoré (entrée spéciale sans description dédiée): ${product.display_name}`);
              skippedCount++;
              continue; 
           }
@@ -548,18 +567,20 @@ async function generateAllProductPages() {
       
       // Vérifier si la description existe pour ce produit
       if (!description) {
-        console.warn(`⚠️  Attention: Aucune description longue trouvée pour ${slug}. Page ignorée.`);
+        console.warn(`⚠️  Attention: Aucune description longue (PRODUCT_DESCRIPTIONS) trouvée pour ${slug}. Page ignorée.`);
         skippedCount++;
         continue; // Passer au produit suivant
       }
       
-      // Vérifier si les images existent
+      // Vérifier si les images existent, sinon utiliser un placeholder
        if (!product.images || !product.images.main) {
-           console.warn(`⚠️  Attention: Image principale manquante pour ${slug}. Utilisation d'un placeholder.`);
-           // Assigner un placeholder si manquant pour éviter erreur
+           console.warn(`⚠️  Attention: Image principale manquante pour ${slug} dans products.json. Utilisation d'un placeholder.`);
            product.images = product.images || {};
-           product.images.main = 'assets/placeholder.jpg';
-           product.images.gallery = product.images.gallery || [];
+           product.images.main = product.images.main || 'assets/placeholder.jpg'; // Assigner placeholder si main manque
+           product.images.gallery = product.images.gallery || []; // Assurer que gallery est un tableau
+       } else if (!Array.isArray(product.images.gallery)) {
+            console.warn(`⚠️  Attention: images.gallery n'est pas un tableau pour ${slug}. Initialisation à tableau vide.`);
+            product.images.gallery = []; // Assurer que c'est un tableau
        }
        
       // Générer le contenu HTML complet pour la page
@@ -577,8 +598,8 @@ async function generateAllProductPages() {
     
     // Afficher le résumé final
     console.log(`\n✨ Terminé! ${generatedCount} pages produits générées, ${skippedCount} entrées ignorées.`);
-    console.log(`\n Asegúrese de que los archivos CSS y JS referenciados existan en las rutas correctas (/assets/css/..., /assets/js/...).`);
-    console.log(`\n Déployez maintenant sur Vercel via GitHub.`);
+    console.log(`\n➡️  Assurez-vous que les fichiers CSS (/assets/css/...) et JS (/assets/js/...) existent.`);
+    console.log(`\n Poussez ces changements sur GitHub pour déclencher le déploiement Vercel.`);
     
   } catch (error) {
     // Gérer les erreurs potentielles (lecture de fichier, écriture, JSON invalide)
