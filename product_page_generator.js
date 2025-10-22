@@ -1,11 +1,9 @@
 const path = require('path');
-/* // Correction : Ajout du début de commentaire
- * SEYMR® - Product Pages Generator
+/* * SEYMR® - Product Pages Generator
  * Génère automatiquement toutes les pages produits depuis products.json
  */
 
 const fs = require('fs').promises;
-// Correction : Suppression de la ligne 'path' en double
 
 // Descriptions complètes des produits
 const PRODUCT_DESCRIPTIONS = {
@@ -204,8 +202,11 @@ function generateProductHTML(product, description) {
   // Préparer les images pour la galerie (plus robuste)
   const mainImage = product.images?.main || 'assets/placeholder.jpg'; // Image principale ou fallback
   const galleryImages = Array.isArray(product.images?.gallery) ? product.images.gallery : [];
-  const thumbnailImages = [mainImage, ...galleryImages].slice(0, 4); // Prend l'image principale + 3 de la galerie max
-  const schemaImages = [mainImage, ...galleryImages]; // Toutes les images pour Schema.org
+  // Assurer que les chemins commencent par /assets/ (pour les URL absolues)
+  const absoluteMainImage = mainImage.startsWith('assets/') ? `/${mainImage}` : mainImage;
+  const absoluteGalleryImages = galleryImages.map(img => img.startsWith('assets/') ? `/${img}` : img);
+  const absoluteThumbnails = [absoluteMainImage, ...absoluteGalleryImages].slice(0, 4); 
+  const schemaImages = [absoluteMainImage, ...absoluteGalleryImages]; // Toutes les images pour Schema.org
 
   // Formatter le prix pour l'affichage
   const formattedPrice = product.price ? product.price.toLocaleString('fr-FR') + ' €' : 'Sur demande';
@@ -226,12 +227,15 @@ function generateProductHTML(product, description) {
     <meta property="og:title" content="${product.display_name} - ${product.tagline} | SEYMR®">
     <meta property="og:description" content="${product.edition}. ${product.description_long.substring(0, 150)}...">
     <meta property="og:type" content="product">
-    <meta property="og:url" content="${pageUrl}"> <meta property="og:image" content="https://seymr.art/${mainImage}"> <meta property="og:image:width" content="1200">
+    <meta property="og:url" content="${pageUrl}"> 
+    <meta property="og:image" content="https://seymr.art${absoluteMainImage}"> <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     ${product.price ? `<meta property="product:price:amount" content="${product.price}">` : ''}
     <meta property="product:price:currency" content="EUR">
     
-    <link rel="canonical" href="${pageUrl}"> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="canonical" href="${pageUrl}"> 
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <style>
@@ -250,28 +254,27 @@ function generateProductHTML(product, description) {
       "name": "${product.display_name}",
       "description": "${product.description_long}",
       "image": [
-        ${schemaImages.map(img => `"https://seymr.art/${img}"`).join(',\n        ')}
+        ${schemaImages.map(img => `"https://seymr.art${img}"`).join(',\n        ')}
       ],
-      "sku": "${itemId}", // SKU unique généré
+      "sku": "${itemId}", 
       "brand": {
         "@type": "Brand",
         "name": "SEYMR®"
       },
       "offers": {
         "@type": "Offer",
-        "url": "${pageUrl}", // Correction: URL avec .html
+        "url": "${pageUrl}", 
         "priceCurrency": "EUR",
-        ${product.price ? `"price": "${product.price}",` : ''} // Prix si disponible
-        "priceValidUntil": "2025-12-31", // Validité du prix (à ajuster si besoin)
-        "itemCondition": "https://schema.org/NewCondition", // État neuf
-        "availability": "${product.edition && (product.edition.includes('exemplaires') || product.edition.includes('Limited')) ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock'}", // Disponibilité basée sur l'édition
+        ${product.price ? `"price": "${product.price}",` : ''} 
+        "priceValidUntil": "2025-12-31", 
+        "itemCondition": "https://schema.org/NewCondition", 
+        "availability": "${product.edition && (product.edition.includes('exemplaires') || product.edition.includes('Limited')) ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/InStock'}", 
         "seller": {
           "@type": "Organization",
           "name": "SEYMR®"
         }
       },
       "material": "${product.materials}",
-      // Propriétés additionnelles pour enrichir le schema
       "additionalProperty": [
         {
           "@type": "PropertyValue",
@@ -288,7 +291,6 @@ function generateProductHTML(product, description) {
           "name": "Conception",
           "value": "${product.design}"
         }
-        // Ajouter d'autres specs si pertinent (poids, dimensions spécifiques)
         ${product.specs && product.specs.dimensions ? `, {
           "@type": "PropertyValue",
           "name": "Dimensions",
@@ -310,12 +312,12 @@ function generateProductHTML(product, description) {
       gtag('js', new Date());
       gtag('config', 'G-XXXXXXXXXX'); // Remplacez par votre ID GA4 réel
       
-      // Événement GA4 - view_item (vue du produit)
+      // Événement GA4 - view_item
       gtag('event', 'view_item', {
         currency: 'EUR',
-        value: ${product.price || 0}, // Utilise 0 si prix non défini
+        value: ${product.price || 0}, 
         items: [{
-          item_id: '${itemId}', // SKU généré
+          item_id: '${itemId}', 
           item_name: '${product.display_name}',
           item_category: '${product.category}',
           item_brand: 'SEYMR',
@@ -372,12 +374,13 @@ function generateProductHTML(product, description) {
 
                 <div class="product-layout">
                     <div class="product-gallery">
-                        <img src="/${mainImage}" 
+                        <img src="${absoluteMainImage}" 
                              alt="${product.display_name} SEYMR® - Vue principale" 
                              class="main-image" 
                              id="mainImage"
-                             fetchpriority="high" width="800" height="800"> <div class="thumbnail-grid">
-                            ${thumbnailImages.map((img, i) => `<img src="/${img}" alt="Vue ${i + 1} de ${product.display_name}" class="thumbnail ${img === mainImage ? 'active' : ''}" data-full="/${img}" width="150" height="150">`).join('\n                            ')}
+                             fetchpriority="high" width="800" height="800"> 
+                        <div class="thumbnail-grid">
+                            ${absoluteThumbnails.map((img, i) => `<img src="${img}" alt="Vue ${i + 1} de ${product.display_name}" class="thumbnail ${img === absoluteMainImage ? 'active' : ''}" data-full="${img}" width="150" height="150">`).join('\n                            ')}
                         </div>
                     </div>
 
@@ -411,7 +414,8 @@ function generateProductHTML(product, description) {
                             </div>
                             <div class="spec-item">
                                 <span class="spec-label">Délai</span>
-                                <span class="spec-value">${product.delivery_time}</span> </div>
+                                <span class="spec-value">${product.delivery_time}</span> 
+                            </div>
                         </div>
 
                         <div class="product-description">
@@ -469,48 +473,44 @@ function generateProductHTML(product, description) {
             if (mainImage && thumbnails.length > 0) {
                  // S'assure que la première miniature correspond à l'image principale initiale
                  const firstThumbSrc = thumbnails[0]?.dataset?.full;
-                 if (firstThumbSrc && mainImage.src !== firstThumbSrc) {
-                     mainImage.src = firstThumbSrc; // Corrige si nécessaire
+                 // Vérifie si l'URL contient bien le domaine avant de comparer/assigner
+                 if (firstThumbSrc && mainImage.src !== new URL(firstThumbSrc, window.location.origin).href) {
+                     mainImage.src = firstThumbSrc; 
                  }
                 
                 thumbnails.forEach(thumb => {
                     thumb.addEventListener('click', function() {
-                        if (this.classList.contains('active')) return; // Ne rien faire si déjà active
+                        if (this.classList.contains('active')) return; 
 
-                        // Gestion du fade (optionnel mais recommandé)
-                        mainImage.style.opacity = '0.5'; // Commence le fondu sortant
+                        mainImage.style.opacity = '0.5'; 
                         
                         setTimeout(() => {
                            mainImage.src = this.dataset.full;
-                           mainImage.alt = this.alt; // Mettre à jour l'alt text
-                           mainImage.style.opacity = '1'; // Fondu entrant
-                        }, 150); // Doit correspondre à la moitié de la transition CSS si utilisée
+                           mainImage.alt = this.alt; 
+                           mainImage.style.opacity = '1'; 
+                        }, 150); 
 
                         thumbnails.forEach(t => t.classList.remove('active'));
                         this.classList.add('active');
                         
-                        // Envoyer événement GA4 si configuré
                         // window.SEYMR_GA4?.content.selectImage(this.dataset.full);
                     });
                 });
             }
 
-            // Pré-sélection produit via bouton CTA
+            // Pré-sélection produit via bouton CTA + GA4 add_to_cart
              const acquireButton = document.getElementById('acquireBtn');
              if (acquireButton) {
                  acquireButton.addEventListener('click', function(e) {
-                      // Pas besoin de e.preventDefault() si le lien pointe déjà vers #contact sur index.html
                       const productName = this.dataset.product;
-                      // On stocke temporairement pour que main.js (sur index.html) puisse le récupérer
                       sessionStorage.setItem('preselectedProduct', productName); 
 
-                      // Envoyer événement GA4 'add_to_cart'
                       const priceText = document.querySelector('.product-price')?.textContent || '0';
-                      const price = parseFloat(priceText.replace(/[^\\d.,]/g, '').replace(',', '.')) || 0; // Gère € et . ou ,
+                      const price = parseFloat(priceText.replace(/[^\\d.,]/g, '').replace(',', '.')) || 0; 
                       
                        if (typeof gtag === 'function') {
-                            const itemIdForGA = '${itemId}'; // Injecté par le template
-                            const productNameForGA = '${product.display_name}'; // Injecté par le template
+                            const itemIdForGA = '${itemId}'; 
+                            const productNameForGA = '${product.display_name}'; 
                             
                             gtag('event', 'add_to_cart', {
                                 currency: 'EUR',
@@ -526,6 +526,7 @@ function generateProductHTML(product, description) {
                        } else {
                             console.warn('gtag non défini, add_to_cart non envoyé.');
                        }
+                       // Pas besoin de e.preventDefault() car le lien href="/index.html#contact" gère la navigation
                  });
              }
         });
@@ -578,9 +579,9 @@ async function generateAllProductPages() {
            product.images = product.images || {};
            product.images.main = product.images.main || 'assets/placeholder.jpg'; // Assigner placeholder si main manque
            product.images.gallery = product.images.gallery || []; // Assurer que gallery est un tableau
-       } else if (!Array.isArray(product.images.gallery)) {
-            console.warn(`⚠️  Attention: images.gallery n'est pas un tableau pour ${slug}. Initialisation à tableau vide.`);
-            product.images.gallery = []; // Assurer que c'est un tableau
+       } else {
+            // Assurer que gallery est un tableau même si main existe
+            product.images.gallery = Array.isArray(product.images.gallery) ? product.images.gallery : [];
        }
        
       // Générer le contenu HTML complet pour la page
@@ -598,7 +599,7 @@ async function generateAllProductPages() {
     
     // Afficher le résumé final
     console.log(`\n✨ Terminé! ${generatedCount} pages produits générées, ${skippedCount} entrées ignorées.`);
-    console.log(`\n➡️  Assurez-vous que les fichiers CSS (/assets/css/...) et JS (/assets/js/...) existent.`);
+    console.log(`\n➡️  Assurez-vous que les fichiers CSS (/assets/css/...) et JS (/assets/js/...) existent et sont à jour.`);
     console.log(`\n Poussez ces changements sur GitHub pour déclencher le déploiement Vercel.`);
     
   } catch (error) {
